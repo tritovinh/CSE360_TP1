@@ -241,7 +241,9 @@ public class ViewAdminHome {
 		alertEmailSent.setHeaderText("Invitation was sent");
 
 		setupButtonUI(button_SendInvitation, "Dialog", 16, 150, Pos.CENTER, 630, 205);
-		button_SendInvitation.setOnAction((_) -> {ControllerAdminHome.performInvitation(); });
+		button_SendInvitation.setOnAction((_) -> {
+			ControllerAdminHome.performInvitation(); 
+			});
 	
 		// GUI Area 4
 		setupButtonUI(button_ManageInvitations, "Dialog", 16, 250, Pos.CENTER, 20, 270);
