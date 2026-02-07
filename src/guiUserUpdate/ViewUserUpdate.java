@@ -17,6 +17,7 @@ import guiNewAccount.ViewNewAccount;
 import guiTools.PasswordEvaluator;
 import guiTools.UserNameRecognizer;
 import guiTools.EmailAddressRecognizer;
+import guiTools.NameRecognizer;
 
 /*******
  * <p> Title: ViewUserUpdate Class. </p>
@@ -222,6 +223,8 @@ public class ViewUserUpdate {
 		theUserUpdateScene = new Scene(theRootPane, width, height);
 
 		// Initialize the pop-up dialogs to an empty text filed.
+		dialogUpdateUsername = new TextInputDialog("");
+		dialogUpdatePassword = new TextInputDialog("");
 		dialogUpdateFirstName = new TextInputDialog("");
 		dialogUpdateMiddleName = new TextInputDialog("");
 		dialogUpdateLastName = new TextInputDialog("");
@@ -229,6 +232,12 @@ public class ViewUserUpdate {
 		dialogUpdateEmailAddresss = new TextInputDialog("");
 
 		// Establish the label for each of the dialogs.
+		dialogUpdateUsername.setTitle("Update Username");
+		dialogUpdateUsername.setHeaderText("Update your Username");
+
+		dialogUpdatePassword.setTitle("Update Password");
+		dialogUpdatePassword.setHeaderText("Update your Password");
+
 		dialogUpdateFirstName.setTitle("Update First Name");
 		dialogUpdateFirstName.setHeaderText("Update your First Name");
 		
@@ -288,9 +297,9 @@ public class ViewUserUpdate {
     				theDatabase.updatePassword(theUser.getUserName(), userInput);
     				theDatabase.getUserAccountDetails(theUser.getUserName());
     				String newPassword = theDatabase.getCurrentPassword();
-    				theUser.setUserName(newPassword);
-    				if (newPassword == null || newPassword.length() < 1)label_CurrentUsername.setText("<none>");
-    				else label_CurrentUsername.setText(newPassword);
+    				theUser.setPassword(newPassword);
+    				if (newPassword == null || newPassword.length() < 1)label_CurrentPassword.setText("<none>");
+    				else label_CurrentPassword.setText(newPassword);
     			} else {
     				Alert invalidPassword = new Alert(Alert.AlertType.INFORMATION);
     				invalidPassword.setTitle("Invalid Password");
@@ -305,40 +314,74 @@ public class ViewUserUpdate {
         setupLabelUI(label_FirstName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 200);
         setupLabelUI(label_CurrentFirstName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 200);
         setupButtonUI(button_UpdateFirstName, "Dialog", 18, 275, Pos.CENTER, 500, 193);
-        button_UpdateFirstName.setOnAction((_) -> {result = dialogUpdateFirstName.showAndWait();
-        	result.ifPresent(_ -> theDatabase.updateFirstName(theUser.getUserName(), result.get()));
-        	theDatabase.getUserAccountDetails(theUser.getUserName());
-         	String newName = theDatabase.getCurrentFirstName();
-           	theUser.setFirstName(newName);
-        	if (newName == null || newName.length() < 1)label_CurrentFirstName.setText("<none>");
-        	else label_CurrentFirstName.setText(newName);
-         	});
+        button_UpdateFirstName.setOnAction((_) -> {
+        	result = dialogUpdateFirstName.showAndWait();
+        	result.ifPresent(nameInput -> {
+        		if (NameRecognizer.checkFullName(nameInput.trim()) == "") {
+        			theDatabase.updateFirstName(theUser.getUserName(), nameInput.trim());
+        			theDatabase.getUserAccountDetails(theUser.getUserName());
+        			String newName = theDatabase.getCurrentFirstName();
+        			theUser.setFirstName(newName);
+        			if (newName == null || newName.length() < 1) label_CurrentFirstName.setText("<none>");
+        			else label_CurrentFirstName.setText(newName);
+        		} else {
+        			Alert invalidName = new Alert(Alert.AlertType.INFORMATION);
+        			invalidName.setTitle("Invalid First Name");
+        			invalidName.setHeaderText("The first name you entered is not valid");
+        			invalidName.setContentText(NameRecognizer.fullNameErrorMessage.isEmpty() ? "Please enter letters only." : NameRecognizer.fullNameErrorMessage);
+        			invalidName.showAndWait();
+        		}
+        	});
+        });
                
         // Middle Name
         setupLabelUI(label_MiddleName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 250);
         setupLabelUI(label_CurrentMiddleName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 250);
         setupButtonUI(button_UpdateMiddleName, "Dialog", 18, 275, Pos.CENTER, 500, 243);
-        button_UpdateMiddleName.setOnAction((_) -> {result = dialogUpdateMiddleName.showAndWait();
-    		result.ifPresent(_ -> theDatabase.updateMiddleName(theUser.getUserName(), result.get()));
-    		theDatabase.getUserAccountDetails(theUser.getUserName());
-    		String newName = theDatabase.getCurrentMiddleName();
-           	theUser.setMiddleName(newName);
-        	if (newName == null || newName.length() < 1)label_CurrentMiddleName.setText("<none>");
-        	else label_CurrentMiddleName.setText(newName);
-    		});
+        button_UpdateMiddleName.setOnAction((_) -> {
+        	result = dialogUpdateMiddleName.showAndWait();
+        	result.ifPresent(nameInput -> {
+        		String trimmed = nameInput.trim();
+        		if (trimmed.isEmpty() || NameRecognizer.checkFullName(trimmed) == "") {
+        			theDatabase.updateMiddleName(theUser.getUserName(), trimmed);
+        			theDatabase.getUserAccountDetails(theUser.getUserName());
+        			String newName = theDatabase.getCurrentMiddleName();
+        			theUser.setMiddleName(newName);
+        			if (newName == null || newName.length() < 1) label_CurrentMiddleName.setText("<none>");
+        			else label_CurrentMiddleName.setText(newName);
+        		} else {
+        			Alert invalidName = new Alert(Alert.AlertType.INFORMATION);
+        			invalidName.setTitle("Invalid Middle Name");
+        			invalidName.setHeaderText("The middle name you entered is not valid");
+        			invalidName.setContentText(NameRecognizer.fullNameErrorMessage.isEmpty() ? "Please enter letters and spaces only." : NameRecognizer.fullNameErrorMessage);
+        			invalidName.showAndWait();
+        		}
+        	});
+        });
         
         // Last Name
         setupLabelUI(label_LastName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 300);
         setupLabelUI(label_CurrentLastName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 300);
         setupButtonUI(button_UpdateLastName, "Dialog", 18, 275, Pos.CENTER, 500, 293);
-        button_UpdateLastName.setOnAction((_) -> {result = dialogUpdateLastName.showAndWait();
-    		result.ifPresent(_ -> theDatabase.updateLastName(theUser.getUserName(), result.get()));
-    		theDatabase.getUserAccountDetails(theUser.getUserName());
-    		String newName = theDatabase.getCurrentLastName();
-           	theUser.setLastName(newName);
-      	if (newName == null || newName.length() < 1)label_CurrentLastName.setText("<none>");
-        	else label_CurrentLastName.setText(newName);
-    		});
+        button_UpdateLastName.setOnAction((_) -> {
+        	result = dialogUpdateLastName.showAndWait();
+        	result.ifPresent(nameInput -> {
+        		if (NameRecognizer.checkFullName(nameInput.trim()) == "") {
+        			theDatabase.updateLastName(theUser.getUserName(), nameInput.trim());
+        			theDatabase.getUserAccountDetails(theUser.getUserName());
+        			String newName = theDatabase.getCurrentLastName();
+        			theUser.setLastName(newName);
+        			if (newName == null || newName.length() < 1) label_CurrentLastName.setText("<none>");
+        			else label_CurrentLastName.setText(newName);
+        		} else {
+        			Alert invalidName = new Alert(Alert.AlertType.INFORMATION);
+        			invalidName.setTitle("Invalid Last Name");
+        			invalidName.setHeaderText("The last name you entered is not valid");
+        			invalidName.setContentText(NameRecognizer.fullNameErrorMessage.isEmpty() ? "Please enter letters only." : NameRecognizer.fullNameErrorMessage);
+        			invalidName.showAndWait();
+        		}
+        	});
+        });
         
         // Preferred First Name
         setupLabelUI(label_PreferredFirstName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 
