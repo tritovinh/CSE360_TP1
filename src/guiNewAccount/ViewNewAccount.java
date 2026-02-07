@@ -57,6 +57,12 @@ public class ViewNewAccount {
 
 	// This alert is used should the invitation code be invalid
     protected static Alert alertInvitationCodeIsInvalid = new Alert(AlertType.INFORMATION);
+	
+	// This alert is used should the user enter an invalid username
+	protected static Alert alertUsernameError = new Alert(AlertType.INFORMATION);
+	
+	// This alter is used should the user enter an invalid password
+	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
 
 	// This alert is used should the user enter two passwords that do not match
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
@@ -185,12 +191,22 @@ public class ViewNewAccount {
 		alertInvitationCodeIsInvalid.setTitle("Invalid Invitation Code");
 		alertInvitationCodeIsInvalid.setHeaderText("The invitation code is not valid.");
 		alertInvitationCodeIsInvalid.setContentText("Correct the code and try again.");
+		
+		// If the unsername is invalid this alter dialog with tell the user
+		alertUsernameError.setTitle("Username is Invalid");
+		alertUsernameError.setHeaderText("Username can only start with a letter.");
+		alertUsernameError.setContentText("Correct the username and try again.");
+
+		// If the password is invalid this alert dialog will tell the user
+		alertPasswordError.setTitle("Password is Invalid");
+		//set header is in ControlerNewAccount
+		alertPasswordError.setContentText("Correct the password and try again");
 
 		// If the passwords do not match, this alert dialog will tell the user
 		alertUsernamePasswordError.setTitle("Passwords Do Not Match");
 		alertUsernamePasswordError.setHeaderText("The two passwords must be identical.");
 		alertUsernamePasswordError.setContentText("Correct the passwords and try again.");
-
+		
         // Set up the account creation and login
         setupButtonUI(button_UserSetup, "Dialog", 18, 200, Pos.CENTER, 475, 210);
         button_UserSetup.setOnAction((_) -> {ControllerNewAccount.doCreateUser(); });

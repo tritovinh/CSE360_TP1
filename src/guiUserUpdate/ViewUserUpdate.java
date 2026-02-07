@@ -5,6 +5,7 @@ import java.util.Optional;
 import database.Database;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -12,6 +13,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import entityClasses.User;
+import guiNewAccount.ViewNewAccount;
+import guiTools.PasswordEvaluator;
+import guiTools.UserNameRecognizer;
 
 /*******
  * <p> Title: ViewUserUpdate Class. </p>
@@ -96,6 +100,8 @@ public class ViewUserUpdate {
 	
 	// These are the set of pop-up dialog boxes that are used to enable the user to change the
 	// the values of the various account detail items.
+	private static TextInputDialog dialogUpdateUsername;
+	private static TextInputDialog dialogUpdatePassword;
 	private static TextInputDialog dialogUpdateFirstName;
 	private static TextInputDialog dialogUpdateMiddleName;
 	private static TextInputDialog dialogUpdateLastName;
@@ -250,11 +256,49 @@ public class ViewUserUpdate {
         setupLabelUI(label_Username, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 100);
         setupLabelUI(label_CurrentUsername, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 100);
         setupButtonUI(button_UpdateUsername, "Dialog", 18, 275, Pos.CENTER, 500, 93);
+        button_UpdateUsername.setOnAction((_) -> {
+        	result = dialogUpdateUsername.showAndWait();
+    		result.ifPresent(userInput -> {
+    			if (UserNameRecognizer.checkForValidUserName(userInput) == "") {
+    				theDatabase.updateUserName(theUser.getUserName(), userInput);
+    				theDatabase.getUserAccountDetails(theUser.getUserName());
+    				String newUserName = theDatabase.getCurrentUsername();
+    				theUser.setUserName(newUserName);
+    				if (newUserName == null || newUserName.length() < 1)label_CurrentUsername.setText("<none>");
+    				else label_CurrentUsername.setText(newUserName);
+    			} else {
+    				Alert invalidUserName = new Alert(Alert.AlertType.INFORMATION);
+    				invalidUserName.setTitle("Invalid Username");
+    				invalidUserName.setHeaderText("That username you entered is not Valid");
+    				invalidUserName.setContentText("Please enter a valid username.");
+    				invalidUserName.showAndWait();
+    			}
+    		});
+        });
        
         // password
         setupLabelUI(label_Password, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 150);
         setupLabelUI(label_CurrentPassword, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 150);
         setupButtonUI(button_UpdatePassword, "Dialog", 18, 275, Pos.CENTER, 500, 143);
+        button_UpdatePassword.setOnAction((_) -> {
+        	result = dialogUpdatePassword.showAndWait();
+    		result.ifPresent(userInput -> {
+    			if (PasswordEvaluator.evaluatePassword(userInput) == "") {
+    				theDatabase.updatePassword(theUser.getUserName(), userInput);
+    				theDatabase.getUserAccountDetails(theUser.getUserName());
+    				String newPassword = theDatabase.getCurrentPassword();
+    				theUser.setUserName(newPassword);
+    				if (newPassword == null || newPassword.length() < 1)label_CurrentUsername.setText("<none>");
+    				else label_CurrentUsername.setText(newPassword);
+    			} else {
+    				Alert invalidPassword = new Alert(Alert.AlertType.INFORMATION);
+    				invalidPassword.setTitle("Invalid Password");
+    				invalidPassword.setHeaderText("There is no " + PasswordEvaluator.passwordErrorMessage);
+    				invalidPassword.setContentText("Please enter a valid password.");
+    				invalidPassword.showAndWait();
+    			}
+    		});
+        });
         
         // First Name
         setupLabelUI(label_FirstName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 200);
@@ -316,14 +360,25 @@ public class ViewUserUpdate {
         setupLabelUI(label_EmailAddress, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 400);
         setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
         setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
-        button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddresss.showAndWait();
-    		result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
-    		theDatabase.getUserAccountDetails(theUser.getUserName());
-    		String newEmail = theDatabase.getCurrentEmailAddress();
-           	theUser.setEmailAddress(newEmail);
-        	if (newEmail == null || newEmail.length() < 1)label_CurrentEmailAddress.setText("<none>");
-        	else label_CurrentEmailAddress.setText(newEmail);
- 			});
+        button_UpdateEmailAddress.setOnAction((_) -> {
+        	result = dialogUpdateEmailAddresss.showAndWait();
+    		result.ifPresent(emailInput -> {
+    			if (EmailAddressRecognizer.checkEmailAddress(emailInput) == "") {
+    				theDatabase.updateEmailAddress(theUser.getUserName(), emailInput);
+    				theDatabase.getUserAccountDetails(theUser.getUserName());
+    				String newEmail = theDatabase.getCurrentEmailAddress();
+    				theUser.setEmailAddress(newEmail);
+    				if (newEmail == null || newEmail.length() < 1)label_CurrentEmailAddress.setText("<none>");
+    				else label_CurrentEmailAddress.setText(newEmail);
+    			} else {
+    				Alert invalidEmail = new Alert(Alert.AlertType.INFORMATION);
+    				invalidEmail.setTitle("Invalid Email");
+    				invalidEmail.setHeaderText("That email you entered is not Valid");
+    				invalidEmail.setContentText("Please enter a valid email address.");
+    				invalidEmail.showAndWait();
+    			}
+    		});
+        });
         
         // Set up the button to proceed to this user's home page
         setupButtonUI(button_ProceedToUserHomePage, "Dialog", 18, 300, 

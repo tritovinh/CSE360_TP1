@@ -241,7 +241,17 @@ public class ViewAdminHome {
 		alertEmailSent.setHeaderText("Invitation was sent");
 
 		setupButtonUI(button_SendInvitation, "Dialog", 16, 150, Pos.CENTER, 630, 205);
-		button_SendInvitation.setOnAction((_) -> {ControllerAdminHome.performInvitation(); });
+		button_SendInvitation.setOnAction((userInput) -> {
+			if (EmailAddressRecognizer.checkEmailAddress(userInput) == "") {
+				ControllerAdminHome.performInvitation(); 
+			} else {
+				Alert invalidEmail = new Alert(Alert.AlertType.INFORMATION);
+				invalidEmail.setTitle("Invalid Email");
+				invalidEmail.setHeaderText("That email you entered is not Valid");
+				invalidEmail.setContentText("Please enter a valid email address.");
+				invalidEmail.showAndWait();
+			}
+			});
 	
 		// GUI Area 4
 		setupButtonUI(button_ManageInvitations, "Dialog", 16, 250, Pos.CENTER, 20, 270);
