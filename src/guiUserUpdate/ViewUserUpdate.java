@@ -16,6 +16,7 @@ import entityClasses.User;
 import guiNewAccount.ViewNewAccount;
 import guiTools.PasswordEvaluator;
 import guiTools.UserNameRecognizer;
+import guiTools.EmailAddressRecognizer;
 
 /*******
  * <p> Title: ViewUserUpdate Class. </p>
